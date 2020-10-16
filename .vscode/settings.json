@@ -1,9 +1,0 @@
-{
-    "python.pythonPath": "C:\\Users\\killi\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
-    "files.exclude": {
-        "**/.classpath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/.factorypath": true
-    }
-}
