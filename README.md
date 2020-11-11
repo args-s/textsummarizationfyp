@@ -11,14 +11,17 @@ and Abstractive method of summarisation.
 ## Python version
 [Version 3.9.0](https://www.python.org/downloads/release/python-390/)
 
-
 ## Imports
 ### networkx
 standard pip install
+
 ### numpy
 Requires Visual Studio Build tools (C++ version 14.0)
+
 ### matplotlib
 Requires cppy before installing
 
 ## nltk
-pip install 
+pip install nltk
+
+
