@@ -24,5 +24,4 @@ Requires cppy before installing
 
 
 # TO DO
-Build Parser Class for SpaCy functions.
 Iterate through docs folder to work on each document.
