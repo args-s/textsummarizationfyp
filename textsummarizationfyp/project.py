@@ -2,26 +2,47 @@ import sys
 import json
 import os
 import constants as const
-import testing
+import graphs
+import textmanip
 
 
 def run():
-    path = os.path.join(
-        const.DOCS, '000e43590fdd2e011cfadaa14e6c14f318d11bbb.json')
-    with open(path) as x:
-        data = json.load(x)
 
-    # Build Abstract of String
-    abstract_raw = ""
+    # Get Raw Text Document
+    doc = ""
+    path = os.path.join(const.TEXT, '1-s2.0-S0140673620303603-Abstract.txt')
+    if(os.path.exists(path)):
+        with open(path) as x:
+            f = open(path, 'r')
+            doc = f.read()
 
-    for i in range(len(data['abstract'])):
-        abstract_raw += data['abstract'][i]['text']
-    # print(abstract_raw)
-
-    # Parse Abstract String
+    # POS Tag Document
+    pos = textmanip.partOfSpeech(doc)
 
     # Build Graph from csv
+    G = graphs.build_graph_from_csv(os.path.join(const.GRAPHS,
+                                                 '1-s2.0-S0140673620303603-Abstract.txt.1c.nncoref.csv'))
 
-    G = testing.build_graph_from_csv(
-        '1-s2.0-S0140673620303603-Abstract.txt.1c.nncoref.csv')
-    print(G.nodes())
+    res = textmanip.breakupSummary(graphs.threeWordSummary(G))
+    words = ''
+    for x in res:
+        words += x + ' '
+
+    pos3 = textmanip.partOfSpeech(words)
+
+    # Get sentences
+    sents = textmanip.getSentences2(doc)
+
+    # Search Doc for a sentence containing the words of 3 word summary
+    summary = ""
+    for sentence in sents:
+        if (res[0] in sentence) and (res[1] in sentence) and (res[2] in sentence) and (res[3] in sentence):
+            for x in range(len(sentence)):
+                summary += x + ''
+
+    print(summary)
+    '''
+    result=graphs.threeWordSummary(G)
+    # Get sentence containing these words
+    words=textmanip.breakupSummary(result)
+    '''

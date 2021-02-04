@@ -101,6 +101,14 @@ def pre_existing_node(graph_name, inNoun):
     return extendedNoun
 
 
+def returnEdgesAsList(G):  # returnEdgesAsList(sourceGraph)
+    """ returns a list of lists, each composed of triples"""
+    res = []
+    for (u, v, reln) in G.edges.data('label'):
+        res.append([u, reln, v])
+    return res
+
+
 def parse_new_coref_chain(in_chain):
     """Possibly using NLTK pos_tag """
     cnt = in_chain.find("_")
@@ -280,3 +288,26 @@ def build_graph_from_csv(file_name):
         #print("After coalescing:\n", temp_graph2.nodes(), end="  ")
 
     return temp_graph2
+
+
+def threeWordSummary(Grf):
+    simplifiedGraf = nx.Graph(Grf)  # simplify to NON-Multi - Graph
+    from networkx.algorithms import tree
+    mst = tree.minimum_spanning_edges(
+        simplifiedGraf, algorithm="kruskal", data=False)
+    edgelist = list(mst)
+    # PageRank  WEIGHT = Count Edges
+    pr = nx.pagerank(simplifiedGraf, alpha=0.8)
+    predsList = returnEdgesAsList(Grf)
+    predsList2 = []
+    for (n1, n2) in edgelist:
+        for [n3, r, n4] in predsList:
+            if (n1 == n3 and n2 == n4) or (n1 == n4 and n2 == n3):
+                scor = pr[n1] * pr[n2]
+                predsList2.append([scor, n1, r, n2])
+                break
+    predsList2.sort(key=lambda x: x[0], reverse=True)
+    print()
+    for [scor, n1, r, n2] in predsList2[0:5]:
+        return(n1, r, n2)
+    print()

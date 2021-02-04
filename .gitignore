@@ -1,2 +1,5 @@
 *.egg-info/
 __pycache__/
+textsummarizationfyp/docs/csv/
+textsummarizationfyp/docs/json/
+textsummarizationfyp/docs/text/
