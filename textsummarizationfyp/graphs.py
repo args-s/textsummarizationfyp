@@ -9,12 +9,15 @@ global coalescing_completed
 
 nltk.download('wordnet')
 nltk.download('words')
+nltk.download('stopwords')
 skip_prepositions = True
 temp_graph2 = nx.OrderedMultiDiGraph()
 termSeparator = '_'
 wn_lemmas = set(nltk.corpus.wordnet.all_lemma_names())
 wnl = nltk.stem.WordNetLemmatizer()
 mode = 'English'
+
+stop_words = set(nltk.corpus.stopwords.words('english'))
 
 
 def prepositionTest(word):
@@ -296,6 +299,7 @@ def threeWordSummary(Grf):
     mst = tree.minimum_spanning_edges(
         simplifiedGraf, algorithm="kruskal", data=False)
     edgelist = list(mst)
+
     # PageRank  WEIGHT = Count Edges
     pr = nx.pagerank(simplifiedGraf, alpha=0.8)
     predsList = returnEdgesAsList(Grf)
@@ -306,8 +310,15 @@ def threeWordSummary(Grf):
                 scor = pr[n1] * pr[n2]
                 predsList2.append([scor, n1, r, n2])
                 break
+    # Sort with highest pr score first
     predsList2.sort(key=lambda x: x[0], reverse=True)
     print()
     for [scor, n1, r, n2] in predsList2[0:5]:
+        if r.find(termSeparator) != -1:
+            words = r.split(termSeparator)
+
+            filtered_words = [w for w in words if not w in stop_words]
+            r = ''.join(filtered_words)
+            #print(n1, r, n2)
         return(n1, r, n2)
     print()

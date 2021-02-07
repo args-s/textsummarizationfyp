@@ -24,4 +24,5 @@ Requires cppy before installing
 
 
 # TO DO
-Iterate through docs folder to work on each document.
+- Clean threeWordSummary. Remove stop words from output.
+- Create unit tests for graph

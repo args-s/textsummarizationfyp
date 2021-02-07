@@ -1,5 +1,5 @@
-from nltk import sent_tokenize, word_tokenize
 import nltk
+from nltk import sent_tokenize, word_tokenize
 import os
 import constants as const
 nltk.download('punkt')
@@ -25,17 +25,6 @@ def getSentences2(text):
     sentences = sent_tokenize(text)
     tokenized_sentences = [word_tokenize(sent) for sent in sentences]
     return tokenized_sentences
-
-
-def breakupSummary(data):
-    words = []
-    for d in data:
-        if d.find('_') != -1:
-            words.append(d.split('_')[0])
-            words.append(d.split('_')[1])
-        else:
-            words.append(d)
-    return words
 
 
 def getAbstract(json_object):

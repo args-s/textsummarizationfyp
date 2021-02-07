@@ -4,6 +4,9 @@ import os
 import constants as const
 import graphs
 import textmanip
+from nltk.stem.snowball import SnowballStemmer
+
+stemmer = SnowballStemmer("english")
 
 
 def run():
@@ -23,26 +26,23 @@ def run():
     G = graphs.build_graph_from_csv(os.path.join(const.GRAPHS,
                                                  '1-s2.0-S0140673620303603-Abstract.txt.1c.nncoref.csv'))
 
-    res = textmanip.breakupSummary(graphs.threeWordSummary(G))
-    words = ''
-    for x in res:
-        words += x + ' '
-
-    pos3 = textmanip.partOfSpeech(words)
-
+    res = list(graphs.threeWordSummary(G))
     # Get sentences
-    sents = textmanip.getSentences2(doc)
+    sentences = textmanip.getSentences2(doc)
 
-    # Search Doc for a sentence containing the words of 3 word summary
-    summary = ""
-    for sentence in sents:
-        if (res[0] in sentence) and (res[1] in sentence) and (res[2] in sentence) and (res[3] in sentence):
-            for x in range(len(sentence)):
-                summary += x + ''
+    # Find sentence in document that contains words whose roots are the results of 3-word summary
+    summ_options = []
+    for s in sentences:
+        score = 0
+        sentstr = ''
+        for word in s:
+            # print(stemmer.stem(word))
+            if ((stemmer.stem(word) == stemmer.stem(res[0])) or (stemmer.stem(word) == stemmer.stem(res[1])) or (stemmer.stem(word) == stemmer.stem(res[2]))):
+                score += 1
+        print("Score: {} \n Sentence: {}".format(score, s))
 
-    print(summary)
-    '''
-    result=graphs.threeWordSummary(G)
-    # Get sentence containing these words
-    words=textmanip.breakupSummary(result)
-    '''
+        if score > 2:
+            sentstr = ' '.join(s)
+            summ_options.append(sentstr)
+
+    print(sentstr)
