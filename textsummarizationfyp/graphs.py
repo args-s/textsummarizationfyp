@@ -5,6 +5,11 @@ import sys
 import os
 import constants as const
 
+from nltk.corpus import wordnet as wn
+from nltk.corpus import words as nltkWords
+from nltk.tokenize import word_tokenize
+
+
 global coalescing_completed
 
 nltk.download('wordnet')
@@ -20,10 +25,24 @@ mode = 'English'
 stop_words = set(nltk.corpus.stopwords.words('english'))
 
 
+def is_pronoun(wrd):
+    return wrd in const.PRONOUNS
+
+
+def is_noun(wrd):
+    zz = wn.synsets(wrd, pos=wn.NOUN)
+    return zz != []
+
+
 def prepositionTest(word):
     prepList = ['of', 'for', 'at', 'on', 'as', 'by', 'in', 'to', 'from',
                 'into', 'through', 'toward', 'with']
     return word in prepList
+
+
+def is_proper_noun(wrd):
+    return ((nltkWords.words().__contains__(wrd) == False)
+            and (wn.synsets(wrd) == []))
 
 
 def head_word(term):  # first word before term separator
@@ -289,8 +308,45 @@ def build_graph_from_csv(file_name):
             iteration_limit -= 1
             #print(iteration_limit, end=" ")
         #print("After coalescing:\n", temp_graph2.nodes(), end="  ")
-
+    print("Returning graph!")
     return temp_graph2
+
+
+def extend_as_set(l1, l2):
+    result = []
+    if len(l1) >= len(l2):
+        result.extend(x for x in l1 if x not in result)
+        donor = l2
+    else:
+        result.extend(x for x in l2 if x not in result)
+        donor = l1
+    result.extend(x for x in donor if x not in result)
+    #resulting_list = list(result.union(donor))
+    coref_terms = '_'.join(word for word in result)
+    return reorganise_coref_chain(coref_terms)
+
+
+def reorganise_coref_chain(strg):  # noun-propernoun-pronoun
+    global termSeparator
+    noun_lis = []
+    propN_lis = []
+    pron_lis = []
+    if strg.find(termSeparator) < 0:
+        slt = strg
+    else:
+        chan = strg.split(termSeparator)
+        for tokn in chan:
+            if tokn in ['a', 'the', 'its']:  # remove problematic words
+                continue
+            elif is_pronoun(tokn.lower()):
+                pron_lis.append(tokn)
+            elif is_noun(tokn):
+                noun_lis.append(tokn)
+            elif is_proper_noun(tokn):
+                propN_lis.append(tokn)
+        res = noun_lis + propN_lis + pron_lis
+        slt = "_".join(res)
+    return slt
 
 
 def threeWordSummary(Grf):

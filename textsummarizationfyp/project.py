@@ -21,12 +21,13 @@ def run():
 
     # POS Tag Document
     pos = textmanip.partOfSpeech(doc)
-
+    print("Building Graph \n")
     # Build Graph from csv
     G = graphs.build_graph_from_csv(os.path.join(const.GRAPHS,
-                                                 '1-s2.0-S0140673620303603-Abstract.txt.1c.nncoref.csv'))
+                                                 '0a1f43c04e0e22fb6efbd94611920bc9680d7ae3.txt.dcorf.csv'))
 
     res = list(graphs.threeWordSummary(G))
+    print("Result of 3 word summary: {}".format(res))
     # Get sentences
     sentences = textmanip.getSentences2(doc)
 
