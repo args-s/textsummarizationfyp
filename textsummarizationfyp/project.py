@@ -39,10 +39,10 @@ def run():
             # print(stemmer.stem(word))
             if ((stemmer.stem(word) == stemmer.stem(res[0])) or (stemmer.stem(word) == stemmer.stem(res[1])) or (stemmer.stem(word) == stemmer.stem(res[2]))):
                 score += 1
-        print("Score: {} \n Sentence: {}".format(score, s))
 
         if score > 2:
             sentstr = ' '.join(s)
             summ_options.append(sentstr)
 
-    print(sentstr)
+    for s in range(len(summ_options)):
+        print("Sentence {}: {}\n".format(s+1, summ_options[s]))

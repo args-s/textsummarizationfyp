@@ -22,7 +22,3 @@ Requires Visual Studio Build tools (C++ version 14.0)
 ### matplotlib
 Requires cppy before installing
 
-
-# TO DO
-- Clean threeWordSummary. Remove stop words from output.
-- Create unit tests for graph
