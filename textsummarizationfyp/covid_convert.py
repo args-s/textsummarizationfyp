@@ -47,20 +47,21 @@ def json2txt():
         # Open file and get title for filename
         with open(filepath,) as f:
             # Intialise paths and new filenames. If no title, 1st 5 chars
-            data = json.load(f)
             print("Now Looking at {}".format(file))
+            data = json.load(f)
+
             if data['metadata']['title'] == '':
                 title = pitac_check(data['body_text'][0]['text'])
 
-                title_file = title[0:5].replace(
-                    " ", "_") + ".txt"
-                abs_file = title[0:5].replace(
-                    " ", "_") + "_Abs.txt"
+                title_file = title[0:20].replace(
+                    " ", "_") + "." + file.replace('.json', '') + ".txt"
+                abs_file = title[0:20].replace(
+                    " ", "_") + "." + file.replace('.json', '') + ".Abs.txt"
             else:
-                title_file = pitac_check(data['metadata']['title']).replace(
-                    " ", "_") + ".txt"
-                abs_file = pitac_check(data['metadata']['title']).replace(
-                    " ", "_") + "_Abs.txt"
+                title_file = pitac_check(data['metadata']['title'][0:20]).replace(
+                    " ", "_") + "." + file.replace('.json', '') + ".txt"
+                abs_file = pitac_check(data['metadata']['title'][0:20]).replace(
+                    " ", "_") + "." + file.replace('.json', '') + ".Abs.txt"
 
             print("Title: {}".format(title_file))
             print("Abstract File: {}".format(abs_file))
@@ -83,14 +84,20 @@ def json2txt():
                 body += i['text']
 
             doc = abstract + body
-
-            # Write abstract to txt file
-            with open(abstract_path, 'x', encoding='utf8') as t:
-                t.write(abstract)
-                t.close()
-            print("Wrote Abstract to {}".format(abstract_path))
-
-            with open(text_path, 'x', encoding='utf8') as t:
-                t.write(doc)
-                t.close()
-            print("Wrote Document to {}".format(text_path))
+            try:
+                # Write abstract to txt file
+                with open(abstract_path, 'x', encoding='utf8') as t:
+                    t.write(abstract)
+                    t.close()
+                print("Wrote Abstract to {}".format(abstract_path))
+            except OSError:
+                print("Error encountered with this file: {} \n".format(abstract_path))
+                pass
+            try:
+                with open(text_path, 'x', encoding='utf8') as t:
+                    t.write(doc)
+                    t.close()
+                print("Wrote Document to {}".format(text_path))
+            except OSError:
+                print("Error with this file: {} \n".format(text_path))
+                pass
