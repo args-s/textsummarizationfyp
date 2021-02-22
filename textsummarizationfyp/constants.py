@@ -3,11 +3,17 @@ import os
 # Project Paths
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-# Document Paths
+# Generic Document Paths
 DOCS = os.path.join(ROOT, 'docs')
 TEXT = os.path.join(DOCS, 'text')
 JS = os.path.join(DOCS, 'json')
 GRAPHS = os.path.join(DOCS, 'csv')
+
+# covid_convert.py
+json_path = os.path.join(DOCS, 'json')
+doc_path = os.path.join(DOCS, 'text')
+pita_chars = [':', ';', "\\", '/', ".",
+              ',', '%', '{', '}', '[', ']', '#', '\"', '?', '(', ')', '-']
 
 # Doc Sets
 PRONOUNS = ["all", "another", "any", "anybody", "anyone", "anything", "as", "aught", "both", "each",
