@@ -42,7 +42,9 @@ def pitac_check(string):
 def covid_convert():
     # Get files not yet converted
     unconverted = list_missing()
-    print(len(unconverted))
+    if len(unconverted) == 0:
+        print("All files have been converted :D")
+        return
 
     # Go through all missing files and convert them
     for file in os.listdir(const.json_path):
