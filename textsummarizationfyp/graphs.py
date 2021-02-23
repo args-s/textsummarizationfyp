@@ -48,9 +48,6 @@ def is_proper_noun(wrd):
 def head_word(term):  # first word before term separator
     global termSeparator
     z = term.split(termSeparator)[0]
-    # if is_pronoun(z):
-    #     return False
-    # else:
     return z
 
 
@@ -119,7 +116,8 @@ def pre_existing_node(graph_name, inNoun):
                     graph_name, remapping, copy=False)
                 graph_name.nodes[extendedNoun]['label'] = extendedNoun
             else:
-                print(inNoun, ">", extendedNoun, end="     ")
+                # print(inNoun, ">", extendedNoun, end="     ") # Add in to show fusion steps
+                print("")
     return extendedNoun
 
 
@@ -235,7 +233,6 @@ def build_graph_from_csv(file_name):
                     elif noun2.lower() == 'unknown':
                         noun2 = chr(ord('@') + unknownCounter) + "unknown"
                         unknownCounter += 1
-
                     if (noun1 == last_s) and (noun2 == last_o) and prepositionTest(verb):
                         # and is_phrasal_verb(last_v + " " + verb)
                         phrasal_verb = last_v + "_" + verb
