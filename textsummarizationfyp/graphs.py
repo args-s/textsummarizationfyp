@@ -116,8 +116,9 @@ def pre_existing_node(graph_name, inNoun):
                     graph_name, remapping, copy=False)
                 graph_name.nodes[extendedNoun]['label'] = extendedNoun
             else:
-                # print(inNoun, ">", extendedNoun, end="     ") # Add in to show fusion steps
-                print("")
+                # Add in to show fusion steps
+                print(inNoun, ">", extendedNoun, end="     ")
+
     return extendedNoun
 
 
@@ -346,16 +347,19 @@ def reorganise_coref_chain(strg):  # noun-propernoun-pronoun
     return slt
 
 
-def threeWordSummary(Grf):
+def getTopTriples(Grf):
     simplifiedGraf = nx.Graph(Grf)  # simplify to NON-Multi - Graph
     from networkx.algorithms import tree
     mst = tree.minimum_spanning_edges(
         simplifiedGraf, algorithm="kruskal", data=False)
     edgelist = list(mst)
+    #print("EdgeList:", edgelist, '\n')
 
     # PageRank  WEIGHT = Count Edges
     pr = nx.pagerank(simplifiedGraf, alpha=0.8)
+    #print("pr:", pr, '\n')
     predsList = returnEdgesAsList(Grf)
+    #print("predsList: ", predsList, '\n')
     predsList2 = []
     for (n1, n2) in edgelist:
         for [n3, r, n4] in predsList:
@@ -365,13 +369,28 @@ def threeWordSummary(Grf):
                 break
     # Sort with highest pr score first
     predsList2.sort(key=lambda x: x[0], reverse=True)
-    print()
+    #print("predsList2: ", predsList2, '\n')
+    # print()
+    #print("Show Slicing: ", predsList2[0:5], '\n')
+    '''
     for [scor, n1, r, n2] in predsList2[0:5]:
-        if r.find(termSeparator) != -1:
-            words = r.split(termSeparator)
+        print(n1, r, n2, end="   ")
+        # Remove stop words entries?
+    '''
+    return(predsList2[0:10])
 
-            filtered_words = [w for w in words if not w in stop_words]
-            r = ''.join(filtered_words)
-            #print(n1, r, n2)
-        return(n1, r, n2)
-    print()
+
+def threeWordSummary(Grf):
+    # Get top triples
+    triples = getTopTriples(Grf)
+    top_triple = triples[0]
+    print('Top Triple: ', top_triple, '\n')
+
+    # Search for sentences using top triple
+    n1 = top_triple[1].split(termSeparator)
+    #print("N1: ", n1, '\n')
+    r = top_triple[2].split(termSeparator)
+    #print("r: ", r, '\n')
+    n2 = top_triple[3].split(termSeparator)
+    #print("N2: ", n2, '\n')
+    return(n1, r, n2)
