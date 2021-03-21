@@ -9,7 +9,6 @@ from nltk.corpus import wordnet as wn
 from nltk.corpus import words as nltkWords
 from nltk.tokenize import word_tokenize
 
-
 global coalescing_completed
 
 nltk.download('wordnet')
