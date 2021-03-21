@@ -7,6 +7,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import words as nltkWords
 from nltk.tokenize import word_tokenize
+from pattern.text.en import singularize
 import constants as const
 from textmanip import getSentences
 
@@ -381,12 +382,12 @@ def getTopTriple(Grf):
     top_triple = predsList2[0]
     print('Top Triple: ', top_triple, '\n')
 
-    # Split options for each word of summary
-    n1 = top_triple[1].split(termSeparator)
+    # Split options for each word of summary into sets to remove duplicates
+    n1 = list(set(top_triple[1].split(termSeparator)))
     #print("N1: ", n1, '\n')
-    r = top_triple[2].split(termSeparator)
+    r = list(set(top_triple[2].split(termSeparator)))
     #print("r: ", r, '\n')
-    n2 = top_triple[3].split(termSeparator)
+    n2 = list(set(top_triple[3].split(termSeparator)))
     #print("N2: ", n2, '\n')
     #print("Top triple: ", n1, r, n2, '\n')
     return(n1, r, n2)
@@ -395,8 +396,20 @@ def getTopTriple(Grf):
 def threeWordSummary(Grf):
     # Get top triple options
     top_triple = getTopTriple(Grf)
+    new_top_triple = list()
+    for i in top_triple:
+        new_top_triple.append(list(i))
     print('Top Triple: ', top_triple, '\n')
-    # Still need to return single triple
+    found = False
+    '''
+    # Check if triple has been determined
+    word = top_triple[0][0]
+    singword = singularize(top_triple[0][0])
+    print("Word: ", word, "Singular: ", singword, '\n')
+    '''
+    print()
+    if(len(top_triple[0]) == 1 and len(top_triple[1] == 1, top_triple[2] == 0)):
+        found = True
 
 
 def getKeySentences(file, top_triple=[]):
