@@ -14,7 +14,7 @@ def partOfSpeech(text):
 
 
 def getSentences(text_file):
-    path = os.path.join(const.DOCS, text_file)
+    path = os.path.join(const.TEXT, text_file)
     file = open(path, "r")
     filedata = file.read()
     sentences = sent_tokenize(filedata)

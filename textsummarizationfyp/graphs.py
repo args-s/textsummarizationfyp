@@ -1,13 +1,14 @@
-import nltk
-import networkx as nx
 import csv
 import sys
 import os
-import constants as const
-
+import nltk
+import networkx as nx
+from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import words as nltkWords
 from nltk.tokenize import word_tokenize
+import constants as const
+from textmanip import getSentences
 
 global coalescing_completed
 
@@ -22,6 +23,7 @@ wnl = nltk.stem.WordNetLemmatizer()
 mode = 'English'
 
 stop_words = set(nltk.corpus.stopwords.words('english'))
+stemmer = SnowballStemmer("english")
 
 
 def is_pronoun(wrd):
@@ -346,7 +348,7 @@ def reorganise_coref_chain(strg):  # noun-propernoun-pronoun
     return slt
 
 
-def getTopTriples(Grf):
+def getTopTriple(Grf):
     simplifiedGraf = nx.Graph(Grf)  # simplify to NON-Multi - Graph
     from networkx.algorithms import tree
     mst = tree.minimum_spanning_edges(
@@ -376,20 +378,77 @@ def getTopTriples(Grf):
         print(n1, r, n2, end="   ")
         # Remove stop words entries?
     '''
-    return(predsList2[0:10])
-
-
-def threeWordSummary(Grf):
-    # Get top triples
-    triples = getTopTriples(Grf)
-    top_triple = triples[0]
+    top_triple = predsList2[0]
     print('Top Triple: ', top_triple, '\n')
 
-    # Search for sentences using top triple
+    # Split options for each word of summary
     n1 = top_triple[1].split(termSeparator)
     #print("N1: ", n1, '\n')
     r = top_triple[2].split(termSeparator)
     #print("r: ", r, '\n')
     n2 = top_triple[3].split(termSeparator)
     #print("N2: ", n2, '\n')
+    print("Top triple: ", n1, r, n2, '\n')
     return(n1, r, n2)
+
+
+def threeWordSummary(Grf):
+    # Get top triple options
+    top_triple = getTopTriple(Grf)
+    print('Top Triple: ', top_triple, '\n')
+
+
+def getKeySentences(file, top_triple=[]):
+    # Given file and optional top_triple, return key sentences of a text document
+    if(top_triple == []):
+        print("No top triples given. I'll get those")
+        # If being used as standalone function, get build graph to get top triple
+        G = build_graph_from_csv(os.path.join(
+            const.GRAPHS, file + '.dcorf.csv'))
+        top_triple = getTopTriple(G)
+
+    sentences = getSentences(file)
+
+    # Get root forms of top triple options to search document
+    top_triple_roots = list()
+    for words in top_triple:
+        new_roots = []
+        for word in words:
+            new_roots.append(stemmer.stem(word))
+        top_triple_roots.append(new_roots)
+    print("Top triple roots: ", top_triple_roots, '\n')
+
+    summ_opts = list()
+    # Check each sentence for key words
+    for sentence in sentences:
+        sentence_root = ''
+        # Get stemmed sentence
+        for word in sentence:
+            var = stemmer.stem(word)
+            if(sentence_root == ' '):
+                sentence_root = var
+            else:
+                sentence_root = sentence_root + " " + var
+        #print("Sentence: ", sentence, '\n')
+        # Check if stemmed sentence contains version of stemmed 3-word summary
+        for n1, r, n2 in [(n1, r, n2) for n1 in top_triple_roots[0] for r in top_triple_roots[1] for n2 in top_triple_roots[2]]:
+            # print(n1, r, n2)
+            if(sentence_root.find(n1) != -1 and sentence_root.find(r) != -1 and sentence_root.find(n2) != -1):
+                print("Adding sentence: ", sentence, '\n')
+                summ_opts.append(sentence)
+                break
+    print("Sentences Matched: ", summ_opts)
+    print()
+    # Show sentences - Go through each sentence and combine into string. Print String
+    for sentence in summ_opts:
+        print_sent = ''
+        for word in sentence:
+            if(print_sent == ' '):
+                print_sent = word
+            else:
+                print_sent = print_sent + " " + word
+        print(print_sent, '\n')
+        return(print_sent)
+
+    def getSimplifiedSentences(sentences):
+        print("not written yet")
