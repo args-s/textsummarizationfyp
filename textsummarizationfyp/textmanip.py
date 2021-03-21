@@ -130,24 +130,3 @@ def json_convert():
                 print("Error with this file: {} \n".format(text_path))
                 pass
     print('Done.')
-
-
-'''
-def getAbstract(json_object):
-     # Get Abstract of json file
-    abstract = ""
-    for i in json_object['abstract']:
-        abstract += json_object['abstract'][i]['text']
-    return abstract
-
-            for i in data['abstract']:
-                abstract += i['text']
-            abstract += "\n"
-
-def getBody(json_object):
-    # Get Body of json file
-    body = ""
-    for i in range(len(json_object['body_text'])):
-        body += json_object['body_text'][i]['text']
-    return body
-'''

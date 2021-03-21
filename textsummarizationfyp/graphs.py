@@ -388,7 +388,7 @@ def getTopTriple(Grf):
     #print("r: ", r, '\n')
     n2 = top_triple[3].split(termSeparator)
     #print("N2: ", n2, '\n')
-    print("Top triple: ", n1, r, n2, '\n')
+    #print("Top triple: ", n1, r, n2, '\n')
     return(n1, r, n2)
 
 
@@ -396,6 +396,7 @@ def threeWordSummary(Grf):
     # Get top triple options
     top_triple = getTopTriple(Grf)
     print('Top Triple: ', top_triple, '\n')
+    # Still need to return single triple
 
 
 def getKeySentences(file, top_triple=[]):
@@ -416,7 +417,7 @@ def getKeySentences(file, top_triple=[]):
         for word in words:
             new_roots.append(stemmer.stem(word))
         top_triple_roots.append(new_roots)
-    print("Top triple roots: ", top_triple_roots, '\n')
+    #print("Top triple roots: ", top_triple_roots, '\n')
 
     summ_opts = list()
     # Check each sentence for key words
@@ -434,11 +435,11 @@ def getKeySentences(file, top_triple=[]):
         for n1, r, n2 in [(n1, r, n2) for n1 in top_triple_roots[0] for r in top_triple_roots[1] for n2 in top_triple_roots[2]]:
             # print(n1, r, n2)
             if(sentence_root.find(n1) != -1 and sentence_root.find(r) != -1 and sentence_root.find(n2) != -1):
-                print("Adding sentence: ", sentence, '\n')
+                #print("Adding sentence: ", sentence, '\n')
                 summ_opts.append(sentence)
                 break
-    print("Sentences Matched: ", summ_opts)
-    print()
+    #print("Sentences Matched: ", summ_opts)
+    # print()
     # Show sentences - Go through each sentence and combine into string. Print String
     for sentence in summ_opts:
         print_sent = ''
@@ -447,7 +448,7 @@ def getKeySentences(file, top_triple=[]):
                 print_sent = word
             else:
                 print_sent = print_sent + " " + word
-        print(print_sent, '\n')
+        #print(print_sent, '\n')
         return(print_sent)
 
     def getSimplifiedSentences(sentences):
