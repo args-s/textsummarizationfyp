@@ -13,6 +13,7 @@ setup(name='textsummarizationfyp',
           'networkx',
           'nltk',
           'numpy',
-          'matplotlib',   
+          'matplotlib',
+          'wordnet',
       ],
       zip_safe=False)

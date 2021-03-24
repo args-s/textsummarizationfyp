@@ -40,3 +40,6 @@ def make_summaries(file):
 
     key_sentences = graphs.getKeySentences(file, top_triple)
     print("Key Sentences: ", key_sentences, '\n')
+
+    triple = graphs.threeWordSummary(G)
+    print("Result of 3 word summary: ", triple, '\n')

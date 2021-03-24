@@ -3,6 +3,7 @@ from nltk import sent_tokenize, word_tokenize
 import json
 import os
 import constants as const
+# For POS Tag
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -15,11 +16,11 @@ def partOfSpeech(text):
 
 def getSentences(text_file):
     path = os.path.join(const.TEXT, text_file)
-    file = open(path, "r")
-    filedata = file.read()
-    sentences = sent_tokenize(filedata)
-    tokenized_sentences = [word_tokenize(sent) for sent in sentences]
-    return tokenized_sentences
+    with open(path, 'r', encoding='utf8') as f:
+        text = f.read()
+        sentences = sent_tokenize(text)
+        tokenized_sentences = [word_tokenize(sent) for sent in sentences]
+        return tokenized_sentences
 
 
 def getSentences2(text):

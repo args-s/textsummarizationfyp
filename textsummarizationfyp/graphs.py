@@ -3,11 +3,12 @@ import sys
 import os
 import nltk
 import networkx as nx
+import itertools
 from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import words as nltkWords
 from nltk.tokenize import word_tokenize
-from pattern.text.en import singularize
+# from pattern.text.en import singularize
 import constants as const
 from textmanip import getSentences
 
@@ -98,7 +99,7 @@ def pre_existing_node(graph_name, inNoun):
             flag = True
             break
         else:
-            #tmp = head_word(graph_node)
+            # tmp = head_word(graph_node)
             # identicality previously tested
             if inNoun_head != False and head_word(graph_node) != False:
                 a = wnl.lemmatize(inNoun_head)
@@ -112,7 +113,7 @@ def pre_existing_node(graph_name, inNoun):
                 termSeparator))  # !!!!!!!!!!!!!!!!!!!!
             extendedNoun = reorganise_coref_chain(extendedNoun)
             if graph_node != extendedNoun:
-                #print(inNoun,"+", graph_node, ">>", extendedNoun, end="     ")
+                # print(inNoun,"+", graph_node, ">>", extendedNoun, end="     ")
                 remapping = {graph_node: extendedNoun}
                 graph_name = nx.relabel_nodes(
                     graph_name, remapping, copy=False)
@@ -167,17 +168,17 @@ def final_pass_coalescing():
     global temp_graph2
     global coalescing_completed
     coalescing_completed = True
-    #node_list = temp_graph2.nodes()
+    # node_list = temp_graph2.nodes()
     node_list = list(temp_graph2)
     print("FPC", end=" ")
     zz = list(temp_graph2)
-    #zzz = type(zz)
+    # zzz = type(zz)
     flag = False
     for graph_node in zz:  # node_list:  # Final-pass Coalescing
         gn_pn = contains_proper_noun(graph_node)
-        #limit = temp_graph2.nodes()
-        #t1 = node_list.index(graph_node)
-        #temp = node_list[1 + node_list.index(graph_node):]
+        # limit = temp_graph2.nodes()
+        # t1 = node_list.index(graph_node)
+        # temp = node_list[1 + node_list.index(graph_node):]
         # subsequent nodes #in limit
         for g_node2 in node_list[1 + node_list.index(graph_node):]:
             gn_pn2 = contains_proper_noun(g_node2)
@@ -204,13 +205,13 @@ def final_pass_coalescing():
             coalescing_completed = False
             break
         # return
-        #print("again", end=" ")
+        # print("again", end=" ")
     return
 
 
 def build_graph_from_csv(file_name):
     """ Includes eager concept fusion rules. Enforces  noun_properNoun_pronoun"""
-    #print(" ...", end="")
+    # print(" ...", end="")
     global temp_graph2
     global termSeparator
     fullPath = os.path.join(
@@ -218,7 +219,7 @@ def build_graph_from_csv(file_name):
     unknownCounter = 1
     with open(fullPath, 'r') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-        #temp_graph2 = nx.OrderedMultiDiGraph()
+        # temp_graph2 = nx.OrderedMultiDiGraph()
         temp_graph2.clear()
         temp_graph2.graph['Graphid'] = file_name
         try:
@@ -239,7 +240,7 @@ def build_graph_from_csv(file_name):
                     if (noun1 == last_s) and (noun2 == last_o) and prepositionTest(verb):
                         # and is_phrasal_verb(last_v + " " + verb)
                         phrasal_verb = last_v + "_" + verb
-                        #print("+PP", phrasal_verb, end="  ")
+                        # print("+PP", phrasal_verb, end="  ")
                         temp_graph2.remove_edge(noun1, noun2)
                         temp_graph2.add_edge(noun1, noun2, label=phrasal_verb)
                         continue
@@ -266,12 +267,12 @@ def build_graph_from_csv(file_name):
                     if not (noun2 in temp_graph2.nodes()):
                         temp_graph2.add_node(noun2, label=noun2)
                     temp_graph2.add_edge(noun1, noun2, label=verb)
-                    #print(noun1, verb, noun2, end="   ")
+                    # print(noun1, verb, noun2, end="   ")
 
                 # Code Graphs
                 elif mode == 'code' or len(row) == 6 or row[0:3] == "Type":
-                    #print("Mode==code", end="")
-                    #termSeparator = ":"
+                    # print("Mode==code", end="")
+                    # termSeparator = ":"
                     # if len(row) == 6:
                     #    b1, b2, methodName, noun1, verb, noun2 = row
                     if len(row) == 6:
@@ -290,7 +291,7 @@ def build_graph_from_csv(file_name):
                     # noun2 = noun2.split(termSeparator) # [0]
                     temp_graph2.add_node(noun2, label=noun2)
                     temp_graph2.add_edge(noun1, noun2, label=verb)
-                    #print(noun1, verb, noun2, end="   ")
+                    # print(noun1, verb, noun2, end="   ")
                 if mode == 'English':
                     last_s = noun1
                     last_v = verb  # Used for phrasal verb identification "run_by"
@@ -299,15 +300,15 @@ def build_graph_from_csv(file_name):
             sys.exit('file %s, line %d: %s' % (csvPath, csvreader.line_num, e))
 
     if mode == 'English':
-        #print("Coalescing:\n", temp_graph2.nodes(), end="  ")
+        # print("Coalescing:\n", temp_graph2.nodes(), end="  ")
         global coalescing_completed
         coalescing_completed = False
         iteration_limit = temp_graph2.number_of_nodes()
         while not coalescing_completed and iteration_limit > 0:
             final_pass_coalescing()
             iteration_limit -= 1
-            #print(iteration_limit, end=" ")
-        #print("After coalescing:\n", temp_graph2.nodes(), end="  ")
+            # print(iteration_limit, end=" ")
+        # print("After coalescing:\n", temp_graph2.nodes(), end="  ")
     print("Returning graph!")
     return temp_graph2
 
@@ -321,7 +322,7 @@ def extend_as_set(l1, l2):
         result.extend(x for x in l2 if x not in result)
         donor = l1
     result.extend(x for x in donor if x not in result)
-    #resulting_list = list(result.union(donor))
+    # resulting_list = list(result.union(donor))
     coref_terms = '_'.join(word for word in result)
     return reorganise_coref_chain(coref_terms)
 
@@ -355,13 +356,13 @@ def getTopTriple(Grf):
     mst = tree.minimum_spanning_edges(
         simplifiedGraf, algorithm="kruskal", data=False)
     edgelist = list(mst)
-    #print("EdgeList:", edgelist, '\n')
+    # print("EdgeList:", edgelist, '\n')
 
     # PageRank  WEIGHT = Count Edges
     pr = nx.pagerank(simplifiedGraf, alpha=0.8)
-    #print("pr:", pr, '\n')
+    # print("pr:", pr, '\n')
     predsList = returnEdgesAsList(Grf)
-    #print("predsList: ", predsList, '\n')
+    # print("predsList: ", predsList, '\n')
     predsList2 = []
     for (n1, n2) in edgelist:
         for [n3, r, n4] in predsList:
@@ -371,9 +372,9 @@ def getTopTriple(Grf):
                 break
     # Sort with highest pr score first
     predsList2.sort(key=lambda x: x[0], reverse=True)
-    #print("predsList2: ", predsList2, '\n')
+    # print("predsList2: ", predsList2, '\n')
     # print()
-    #print("Show Slicing: ", predsList2[0:5], '\n')
+    # print("Show Slicing: ", predsList2[0:5], '\n')
     '''
     for [scor, n1, r, n2] in predsList2[0:5]:
         print(n1, r, n2, end="   ")
@@ -382,34 +383,50 @@ def getTopTriple(Grf):
     top_triple = predsList2[0]
     print('Top Triple: ', top_triple, '\n')
 
-    # Split options for each word of summary into sets to remove duplicates
+    # Split options for each word of summary into sets and remove duplicates
     n1 = list(set(top_triple[1].split(termSeparator)))
-    #print("N1: ", n1, '\n')
+    # print("N1: ", n1, '\n')
     r = list(set(top_triple[2].split(termSeparator)))
-    #print("r: ", r, '\n')
+    # print("r: ", r, '\n')
     n2 = list(set(top_triple[3].split(termSeparator)))
-    #print("N2: ", n2, '\n')
-    #print("Top triple: ", n1, r, n2, '\n')
+    # print("N2: ", n2, '\n')
+    # print("Top triple: ", n1, r, n2, '\n')
     return(n1, r, n2)
 
 
 def threeWordSummary(Grf):
     # Get top triple options
     top_triple = getTopTriple(Grf)
-    new_top_triple = list()
-    for i in top_triple:
-        new_top_triple.append(list(i))
-    print('Top Triple: ', top_triple, '\n')
+    print('Top Triple from 3word: ', top_triple, '\n')
     found = False
-    '''
-    # Check if triple has been determined
-    word = top_triple[0][0]
-    singword = singularize(top_triple[0][0])
-    print("Word: ", word, "Singular: ", singword, '\n')
-    '''
-    print()
-    if(len(top_triple[0]) == 1 and len(top_triple[1] == 1, top_triple[2] == 0)):
-        found = True
+
+    # Remove stop words
+    filtered_triple = list()
+    for group in top_triple:
+        filtered_group = []
+        for word in group:
+            if word not in stop_words:
+                filtered_group.append(word)
+        filtered_triple.append(filtered_group)
+        print(filtered_group)
+
+    for group in filtered_triple:
+        # Go through each possible combination once unless alrady one word
+        if len(group) > 1:
+            new_group = set()
+            for a, b in itertools.combinations(group, 2):
+                synonyms = set()
+                # Get synonyms of a in group
+                for syn in wn.synsets(a):
+                    for l in syn.lemmas():
+                        synonyms.add(l.name())
+                    # If b is a synonym of a, get the average word and put in new group
+                if b in synonyms:
+                    # If b is a synonym of add their lowest common hypernym to the new group
+                    new_group.add(wn.synsets(
+                        a)[0].lowest_common_hypernyms(wn.synsets(b)[0]))
+
+# TODO: Sort according to most abstract, keep filtering until none of the words are synonyms
 
 
 def getKeySentences(file, top_triple=[]):
@@ -430,7 +447,7 @@ def getKeySentences(file, top_triple=[]):
         for word in words:
             new_roots.append(stemmer.stem(word))
         top_triple_roots.append(new_roots)
-    #print("Top triple roots: ", top_triple_roots, '\n')
+    # print("Top triple roots: ", top_triple_roots, '\n')
 
     summ_opts = list()
     # Check each sentence for key words
@@ -443,15 +460,15 @@ def getKeySentences(file, top_triple=[]):
                 sentence_root = var
             else:
                 sentence_root = sentence_root + " " + var
-        #print("Sentence: ", sentence, '\n')
+        # print("Sentence: ", sentence, '\n')
         # Check if stemmed sentence contains version of stemmed 3-word summary
         for n1, r, n2 in [(n1, r, n2) for n1 in top_triple_roots[0] for r in top_triple_roots[1] for n2 in top_triple_roots[2]]:
             # print(n1, r, n2)
             if(sentence_root.find(n1) != -1 and sentence_root.find(r) != -1 and sentence_root.find(n2) != -1):
-                #print("Adding sentence: ", sentence, '\n')
+                # print("Adding sentence: ", sentence, '\n')
                 summ_opts.append(sentence)
                 break
-    #print("Sentences Matched: ", summ_opts)
+    # print("Sentences Matched: ", summ_opts)
     # print()
     # Show sentences - Go through each sentence and combine into string. Print String
     for sentence in summ_opts:
@@ -461,8 +478,6 @@ def getKeySentences(file, top_triple=[]):
                 print_sent = word
             else:
                 print_sent = print_sent + " " + word
-        #print(print_sent, '\n')
+        # print(print_sent, '\n')
         return(print_sent)
-
-    def getSimplifiedSentences(sentences):
-        print("not written yet")
+# TODO: Simplify each sentence
