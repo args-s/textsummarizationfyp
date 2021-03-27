@@ -8,25 +8,13 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 
-def partOfSpeech(text):
-    tokens = nltk.word_tokenize(text)
-    tag = nltk.pos_tag(tokens)
-    return tag
-
-
 def getSentences(text_file):
-    path = os.path.join(const.TEXT, text_file)
+    path = os.path.join(const.doc_path, text_file)
     with open(path, 'r', encoding='utf8') as f:
         text = f.read()
         sentences = sent_tokenize(text)
         tokenized_sentences = [word_tokenize(sent) for sent in sentences]
         return tokenized_sentences
-
-
-def getSentences2(text):
-    sentences = sent_tokenize(text)
-    tokenized_sentences = [word_tokenize(sent) for sent in sentences]
-    return tokenized_sentences
 
 
 def list_missing():
@@ -55,7 +43,9 @@ def list_missing():
 
 def pitac_check(string):
     # Check for and remove speical characters
-    for pitac in const.pita_chars:
+    pita_chars = [':', ';', "\\", '/', ".",
+                  ',', '%', '{', '}', '[', ']', '#', '\"', '?', '(', ')', '-', '*', '$', '&', '£', "\'"]
+    for pitac in pita_chars:
         string = string.replace(pitac, '')
     return(string)
 

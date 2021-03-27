@@ -10,6 +10,6 @@ if __name__ == '__main__':
     json_convert()
 
     # Go through graphs to create summaries
-    for graph in os.listdir(const.TEXT):
+    for doc in os.listdir(const.TEXT):
         # Get 3 word summaries and sentecnes containing key phrase
-        project.make_summaries(graph)
+        project.make_summaries(doc)

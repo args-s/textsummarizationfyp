@@ -214,8 +214,10 @@ def build_graph_from_csv(file_name):
     # print(" ...", end="")
     global temp_graph2
     global termSeparator
+    # Should be const.GRAPHS??? HOW does it still work with const.DOCS?
     fullPath = os.path.join(
-        const.DOCS, file_name)
+        const.GRAPHS, file_name)
+    print(fullPath)
     unknownCounter = 1
     with open(fullPath, 'r') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -355,6 +357,7 @@ def getTopTriple(Grf):
     from networkx.algorithms import tree
     mst = tree.minimum_spanning_edges(
         simplifiedGraf, algorithm="kruskal", data=False)
+    print(mst, '\n')
     edgelist = list(mst)
     # print("EdgeList:", edgelist, '\n')
 
@@ -405,31 +408,57 @@ def threeWordSummary(Grf):
     for group in top_triple:
         filtered_group = []
         for word in group:
-            if word not in stop_words:
+            # Remove stop words and words outside wordnet
+            if ((word not in stop_words) and (wn.synsets(word) != [])):
                 filtered_group.append(word)
         filtered_triple.append(filtered_group)
-        print(filtered_group)
+        # print(filtered_group)
+    print(filtered_triple)
 
+    final_triple = []
     for group in filtered_triple:
-        # Go through each possible combination once unless alrady one word
-        if len(group) > 1:
-            new_group = set()
+        # If single word not found
+        print("Now on: ", group, '\n')
+        if(len(group) > 1):
+            print(group, " has more than one element.\n")
+            # Sort words in group according to how abstract they are
+            group.sort(key=howAbstract, reverse=True)
+            print("Sorted for abstraction: ", group)
+            new_group = list()
+            # Go through each unique pair combination of words
             for a, b in itertools.combinations(group, 2):
                 synonyms = set()
+                print("Checking words: ", a, b)
                 # Get synonyms of a in group
                 for syn in wn.synsets(a):
                     for l in syn.lemmas():
                         synonyms.add(l.name())
-                    # If b is a synonym of a, get the average word and put in new group
+                # If b is a synonym of a, merge these using the average word
+                print("Synonyms for", a, ": ", synonyms, '\n')
                 if b in synonyms:
-                    # If b is a synonym of add their lowest common hypernym to the new group
-                    new_group.add(wn.synsets(
-                        a)[0].lowest_common_hypernyms(wn.synsets(b)[0]))
+                    print("Merging synonyms: ", a, b, '\n')
+                    # Add string version of word
+                    new_group.append(wn.synsets(
+                        a)[0].lowest_common_hypernyms(wn.synsets(b)[0])[0].lemmas()[0].name())
+                # Get new list of merged words. Replace group with new group
+            final_triple.append(new_group)
+        else:
+            final_triple.append(group)
 
-# TODO: Sort according to most abstract, keep filtering until none of the words are synonyms
+    # print("Final Triple: ", final_triple)
+    return(final_triple)
+
+
+def howAbstract(word):
+    # Get minimum distance to root form of a word
+    print(word, min([len(path)
+                     for path in wn.synsets(word)[0].hypernym_paths()]))
+    return(min([len(path) for path in wn.synsets(word)[0].hypernym_paths()]))
 
 
 def getKeySentences(file, top_triple=[]):
+    remove_tags = ['RB', 'JJ', '\'\'', 'POS',
+                   'JJ', 'IN', 'TO', 'WP', 'PRP', 'DT']
     # Given file and optional top_triple, return key sentences of a text document
     if(top_triple == []):
         print("No top triples given. I'll get those")
@@ -468,16 +497,24 @@ def getKeySentences(file, top_triple=[]):
                 # print("Adding sentence: ", sentence, '\n')
                 summ_opts.append(sentence)
                 break
-    # print("Sentences Matched: ", summ_opts)
-    # print()
-    # Show sentences - Go through each sentence and combine into string. Print String
+
+    # summ_opts = list of key sentences
+    # POS tag each sentence
     for sentence in summ_opts:
-        print_sent = ''
+        summ_opts = [nltk.pos_tag(sentence) if i ==
+                     sentence else i for i in summ_opts]
+
+    all_sents = []
+    for sentence in summ_opts:
+        sentence_str = ''
         for word in sentence:
-            if(print_sent == ' '):
-                print_sent = word
-            else:
-                print_sent = print_sent + " " + word
-        # print(print_sent, '\n')
-        return(print_sent)
+            # If word not in stop words or tagged with removable tag add to sentence
+            if(not((word[0] in stop_words) or (word[1] in remove_tags))):
+                if(sentence_str == ''):
+                    sentence_str = word[0]
+                else:
+                    sentence_str = sentence_str + " " + word[0]
+        all_sents.append(sentence_str)
+    return(all_sents)
+
 # TODO: Simplify each sentence
