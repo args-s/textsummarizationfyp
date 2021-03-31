@@ -17,6 +17,11 @@ See setup.py
 
 ## Configuration
 
+### Activate virtual environment
+Enter project folder
+'''
+source venv/bin/activate
+
 ## Build library
 '''
  cd textsummarizationfyp/textsummarizationfyp
